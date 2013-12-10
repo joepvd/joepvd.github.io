@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>escape code</title><link href="http://joepvd.github.io/" rel="alternate"></link><link href="http://joepvd.github.io/all.atom" rel="self"></link><id>http://joepvd.github.io/</id><updated>2013-12-10T00:00:00+01:00</updated><entry><title>Parameter expansion in zsh</title><link href="http://joepvd.github.io/parameter-expansion-in-zsh.html" rel="alternate"></link><updated>2013-12-10T00:00:00+01:00</updated><author><name>joepd</name></author><id>tag:joepvd.github.io,2013-12-10:parameter-expansion-in-zsh.html</id><summary type="html">&lt;p&gt;The shell is a high quality text processor, and zsh is especially suited for that purpose.  In this post, I will show some of the tricks I use for an editing problem that I encounter every day.  Concretely: How to quickly generate queries, after receiving a list of IDs.  This is what the result should look like:&lt;/p&gt;
+&lt;pre class="code sql literal-block"&gt;
+&lt;span class="k"&gt;select&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="k"&gt;from&lt;/span&gt; &lt;span class="k"&gt;table&lt;/span&gt; &lt;span class="k"&gt;where&lt;/span&gt; &lt;span class="n"&gt;ID&lt;/span&gt; &lt;span class="k"&gt;in&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;'1234'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;'2345'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;'3456'&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;/pre&gt;
+&lt;p&gt;A fast way to achieve this looks thusly:&lt;/p&gt;
+&lt;pre class="code console literal-block"&gt;
+&lt;span class="gp"&gt;%&lt;/span&gt; &lt;span class="nv"&gt;ar&lt;/span&gt;&lt;span class="o"&gt;=(&lt;/span&gt;
+&lt;span class="go"&gt;array&amp;gt; 1234
+array&amp;gt; 2345
+array&amp;gt; 3456
+array&amp;gt; )
+
+&lt;/span&gt;&lt;span class="gp"&gt;%&lt;/span&gt; print &lt;span class="s2"&gt;&amp;quot;select * from table where id in (${(j:, :)${(qq)ar[&amp;#64;]}});&amp;quot;&lt;/span&gt;
+&lt;span class="go"&gt;select * from table where id in ('1234', '2345', '3456');&lt;/span&gt;
+&lt;/pre&gt;
+&lt;p&gt;What is happening here? First I am creating an array of something I have available in my paste buffer: I type the name of an array, &lt;cite&gt;=&lt;/cite&gt;, and &lt;cite&gt;(&lt;/cite&gt;, and press enter. Then I paste a list of IDs, close it off with a &lt;cite&gt;)&lt;/cite&gt;. Now the info is available at my fingertips. The second action, the print statement with the hardly memorable parameter expansion, is the main topic of this post.&lt;/p&gt;
+&lt;p&gt;Shells provide convenience functions to do stuff with parameters, and &lt;cite&gt;zsh&lt;/cite&gt; surely is the most advanced in this regard.  These parameter expansions are easiest to read from the inside to the outside, so let's have a look at &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;${(qq)ar[&amp;#64;]}&lt;/span&gt;&lt;/tt&gt;.  This consists of two parts, &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;${ar[&amp;#64;]}&lt;/span&gt;&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;(qq)&lt;/tt&gt;.&lt;/p&gt;
+&lt;p&gt;The result of &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;${ar[&amp;#64;]}&lt;/span&gt;&lt;/tt&gt; is into all the elements of array &lt;tt class="docutils literal"&gt;ar&lt;/tt&gt;.  In any shell that conforms to POSIX, you can specify elements of an array by encapsulating them in square brackets: &lt;tt class="docutils literal"&gt;${ar[2]}&lt;/tt&gt; would be &lt;tt class="docutils literal"&gt;2345&lt;/tt&gt;.  One can use the &lt;tt class="docutils literal"&gt;&amp;#64;&lt;/tt&gt; to say that you want all the indexes.&lt;/p&gt;
+&lt;p&gt;In &lt;tt class="docutils literal"&gt;zsh&lt;/tt&gt;, if there is an opening bracket directly after the curly opening bracket, magic is immanent.  The bracketed characters are flags.  For a complete overview of what can be done, see &lt;tt class="docutils literal"&gt;man zshexpn | less &lt;span class="pre"&gt;+/'^&lt;/span&gt; *Parameter Expansion Flags'&lt;/tt&gt;. In this case, the members of &lt;tt class="docutils literal"&gt;ar&lt;/tt&gt; are treated with the action that is hiding behind the &lt;tt class="docutils literal"&gt;qq&lt;/tt&gt;.  The effect of this flag is quoted with single quotes.  (You can use three q's for double quotes).&lt;/p&gt;
+&lt;p&gt;So the net result of the inner expansion is a copy of the arrat &lt;tt class="docutils literal"&gt;ar&lt;/tt&gt;, with the difference that the elements are quoted.  This is the intermediate result what the outer expansion, &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;${(j:,&lt;/span&gt; &lt;span class="pre"&gt;:)…}&lt;/span&gt;&lt;/tt&gt; is working with.  The flag &lt;tt class="docutils literal"&gt;j&lt;/tt&gt; is for joining the elements of an array, with whatever is between the colons as a separator, in our case a comma followed by space. The colons are arbitrary: If your join string contains colons itself, you can take a comma or a period, or whatever.&lt;/p&gt;
+&lt;p&gt;The result is, as you have seen, that &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;${(j:,&lt;/span&gt; &lt;span class="pre"&gt;:)${(qq)ar[&amp;#64;]}}&lt;/span&gt;&lt;/tt&gt; is expanded to a comma separated line of quoted elements of array &lt;tt class="docutils literal"&gt;ar&lt;/tt&gt;.  As I use this kind of expansion on a daily basis, and this expansion is a bit too tedious to type in every time, I spent a bit of time to make this expansion available at my finger tips in the form of a shell function &lt;tt class="docutils literal"&gt;a2q&lt;/tt&gt;:&lt;/p&gt;
+&lt;pre class="code sh literal-block"&gt;
+a2q &lt;span class="o"&gt;()&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+        print &lt;span class="k"&gt;${&lt;/span&gt;&lt;span class="p"&gt;(j:, :)&lt;/span&gt;&lt;span class="k"&gt;${&lt;/span&gt;&lt;span class="p"&gt;(Pqq)1&lt;/span&gt;&lt;span class="k"&gt;}&lt;/span&gt;&lt;span class="p"&gt;[&amp;#64;]&lt;/span&gt;&lt;span class="k"&gt;}&lt;/span&gt;
+&lt;span class="o"&gt;}&lt;/span&gt;
+&lt;/pre&gt;
+&lt;p&gt;This can be used as follows:&lt;/p&gt;
+&lt;pre class="code console literal-block"&gt;
+&lt;span class="gp"&gt;%&lt;/span&gt; print &lt;span class="s2"&gt;&amp;quot;select * from table where id in ($(a2q ar));&amp;quot;&lt;/span&gt;
+&lt;/pre&gt;
+&lt;p&gt;Compared to the interactive version, the array is a positional parameter: &lt;tt class="docutils literal"&gt;$1&lt;/tt&gt; is being expanded, so you can type: &lt;tt class="docutils literal"&gt;a2q myarray&lt;/tt&gt; to have &lt;tt class="docutils literal"&gt;a2q&lt;/tt&gt; work on &lt;tt class="docutils literal"&gt;myarray&lt;/tt&gt;. In order to make this work, an extra trick needed to be added:  The &lt;cite&gt;P&lt;/cite&gt;-flag has been added to the inner parameter expansion flags. This makes that the resulting string is considered to be a parameter.&lt;/p&gt;
+&lt;p&gt;This works great, but it can be generalized.  Sometimes the list of IDs is given as an file.  By virtue of the &lt;cite&gt;f&lt;/cite&gt;-flag, the following snippet loads the newline separated contents of file &lt;cite&gt;file&lt;/cite&gt; into array &lt;cite&gt;array&lt;/cite&gt;:&lt;/p&gt;
+&lt;pre class="code sh literal-block"&gt;
+&lt;span class="nv"&gt;array&lt;/span&gt;&lt;span class="o"&gt;=(&lt;/span&gt; &lt;span class="k"&gt;${&lt;/span&gt;&lt;span class="p"&gt;(f)&lt;/span&gt;&lt;span class="k"&gt;$(&lt;/span&gt;&amp;lt;file&lt;span class="k"&gt;)}&lt;/span&gt; &lt;span class="o"&gt;)&lt;/span&gt;
+&lt;/pre&gt;
+&lt;p&gt;Just to facilitate laziness, the function a2q can be expanded to check what type of argument it got, and based on that, populate a temporary array with infos. Multiple arguments are allowed. If no argument is provided, a2q will listen to STDIN, so you can pipe the output of another command to it. After all the processing, the last step is to print the contents of the array in the desired way:&lt;/p&gt;
+&lt;pre class="code sh literal-block"&gt;
+emulate -L zsh
+&lt;span class="nb"&gt;typeset&lt;/span&gt; -U ar
+&lt;span class="nv"&gt;ar&lt;/span&gt;&lt;span class="o"&gt;=()&lt;/span&gt;
+_err&lt;span class="o"&gt;()&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+    &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Do not understand: ${1}&amp;quot;&lt;/span&gt; &amp;gt;&amp;amp;2
+    &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Arguments need to be files, names of arrays, or standard input.&amp;quot;&lt;/span&gt; &amp;gt;&amp;amp;2
+    &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s1"&gt;'Arrays must be referenced by name, so use `array` instead of `$array`.'&lt;/span&gt; &amp;gt;&amp;amp;2
+    &lt;span class="nb"&gt;exit &lt;/span&gt;1
+&lt;span class="o"&gt;}&lt;/span&gt;
+
+&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="o"&gt;[[&lt;/span&gt; &lt;span class="nv"&gt;$# &lt;/span&gt;&lt;span class="o"&gt;==&lt;/span&gt; 0 &lt;span class="o"&gt;]]&lt;/span&gt;; &lt;span class="k"&gt;then&lt;/span&gt;
+    &lt;span class="c"&gt;# Listen to STDIN if no arguments are provided
+&lt;/span&gt;    &lt;span class="nv"&gt;ar&lt;/span&gt;&lt;span class="o"&gt;=(&lt;/span&gt; &lt;span class="k"&gt;${&lt;/span&gt;&lt;span class="p"&gt;(f)&lt;/span&gt;&lt;span class="k"&gt;$(&lt;/span&gt;&amp;lt;&amp;amp;0&lt;span class="k"&gt;)}&lt;/span&gt; &lt;span class="o"&gt;)&lt;/span&gt;
+&lt;span class="k"&gt;fi
+
+while&lt;/span&gt; &lt;span class="o"&gt;[[&lt;/span&gt; &lt;span class="nv"&gt;$# &lt;/span&gt;&amp;gt; 0 &lt;span class="o"&gt;]]&lt;/span&gt;; &lt;span class="k"&gt;do
+    if&lt;/span&gt; &lt;span class="o"&gt;[[&lt;/span&gt; -r &lt;span class="s2"&gt;&amp;quot;$1&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; -f &lt;span class="s2"&gt;&amp;quot;$1&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;]]&lt;/span&gt;; &lt;span class="k"&gt;then&lt;/span&gt;
+        &lt;span class="c"&gt;# A readable file.
+&lt;/span&gt;        &lt;span class="nv"&gt;ar&lt;/span&gt;&lt;span class="o"&gt;=(&lt;/span&gt;
+            &lt;span class="nv"&gt;$ar&lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&amp;#64;&lt;span class="o"&gt;]&lt;/span&gt;
+            &lt;span class="s2"&gt;&amp;quot;${(fq)$(&amp;lt;$1)}&amp;quot;&lt;/span&gt;
+        &lt;span class="o"&gt;)&lt;/span&gt;
+    &lt;span class="k"&gt;elif&lt;/span&gt; &lt;span class="o"&gt;[[&lt;/span&gt; &lt;span class="k"&gt;${&lt;/span&gt;&lt;span class="p"&gt;(Pt)1&lt;/span&gt;&lt;span class="k"&gt;}&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;array&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;]]&lt;/span&gt;; &lt;span class="k"&gt;then
+        &lt;/span&gt;&lt;span class="nv"&gt;ar&lt;/span&gt;&lt;span class="o"&gt;=(&lt;/span&gt;
+            &lt;span class="nv"&gt;$ar&lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&amp;#64;&lt;span class="o"&gt;]&lt;/span&gt;
+            &lt;span class="k"&gt;${&lt;/span&gt;&lt;span class="p"&gt;(Pq)1&lt;/span&gt;&lt;span class="k"&gt;}&lt;/span&gt;
+        &lt;span class="o"&gt;)&lt;/span&gt;
+    &lt;span class="k"&gt;else
+        &lt;/span&gt;_err
+    &lt;span class="k"&gt;fi
+    &lt;/span&gt;&lt;span class="nb"&gt;shift
+&lt;/span&gt;&lt;span class="k"&gt;done
+
+&lt;/span&gt;print &lt;span class="k"&gt;${&lt;/span&gt;&lt;span class="p"&gt;(j:, :)&lt;/span&gt;&lt;span class="k"&gt;${&lt;/span&gt;&lt;span class="p"&gt;(qq)ar[&amp;#64;]&lt;/span&gt;&lt;span class="k"&gt;}}&lt;/span&gt;
+&lt;/pre&gt;
+&lt;p&gt;I stored the above as &lt;tt class="docutils literal"&gt;a2q&lt;/tt&gt; in a &lt;a class="reference external" href="http://zsh.sourceforge.net/Doc/Release/Functions.html#Autoloading-Functions"&gt;directory whose contents gets autoloaded&lt;/a&gt; when required, so I have it available at my finger tips.&lt;/p&gt;
+&lt;p&gt;Enjoy!&lt;/p&gt;
+</summary></entry><entry><title>About this website</title><link href="http://joepvd.github.io/about-this-website.html" rel="alternate"></link><updated>2013-11-01T00:00:00+01:00</updated><author><name>joepd</name></author><id>tag:joepvd.github.io,2013-11-01:about-this-website.html</id><summary type="html">&lt;p&gt;Hello world! This is the first post to my site, which will double as the about page.  Yet another site dedicated to consoles, shells, and old school interfaces to solved problems?  Isn't there enough documentation and experience out there to warrant another site?&lt;/p&gt;
+&lt;p&gt;As with all good questions, the answer is both &lt;em&gt;yes&lt;/em&gt; and &lt;em&gt;no&lt;/em&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Yes&lt;/strong&gt;.  I proudly want to produce new content as a tribute to all the valuable and intricate pieces of information that have been shared before.  I have learnt an awful lot from excellent people documenting informally how they overcome smaller and bigger technological hurdles while accomplishing stuff.  And I have enjoyed doing so.  A second reason for this resounding yes, is the hope that processes of documenting and publishing trivia, intricacies and insights will assist me in the battle against forgetfulness.&lt;/p&gt;
+&lt;p&gt;But I fancy to think that also that also &lt;strong&gt;No&lt;/strong&gt; is a valid answer:  This site will have a distinctive perspective.  One thing where I find current informal, online documentation lacking, is in the description of &lt;strong&gt;interactive usage&lt;/strong&gt; of tools.  Much of the online documentation is a static description of how tools work, whereas how those tools can be used efficiently in a work flow of analyzing and fixing problems.  If this were a blog about cooking, I would try to refrain from showing the ingredients and knives, and rather focus on how to cut and fry an onion to acchieve different results.&lt;/p&gt;
+&lt;p&gt;I have a fetish for basic tools.  Be it a sharp knife in the kitchen, or the precise power tools that the One Thing Well software philosophy has brought about.  The process of interactive discovery of the real problem is where the flexibility of the software tool philosophy really shines.  In this blog I hope to provide some useful perspectives, approaches and recipes about the intersection of basic tools and work flows.&lt;/p&gt;
+&lt;p&gt;This site is statically generated with &lt;a class="reference external" href="http://getpelican.com"&gt;Pelican&lt;/a&gt;, and I don't feel the need to take care of comments.  I do not want to imply that I do not like feed back, but prefer to get spam in my mail box rather than on the public net that I need to maintain.  For now, for praise and bug reports, you can reach me best over email. I am sure you can puzzle my address together from the following bits of information:&lt;/p&gt;
+&lt;p&gt;user: escape-code
+host: xs4all
+tld: nl&lt;/p&gt;
+&lt;p&gt;Enjoy reading!&lt;/p&gt;
+</summary></entry></feed>

@@ -1,0 +1,258 @@
+/*
+ * @import url("pygment.css");
+ */
+
+/* colors to be used from CB: 
+ * darkest: #191c1e //bg body
+ * #3b4245
+ * #292f30 //bg article
+ */
+
+/***Global***/
+body {
+    //background-color: #191c1e;
+    background-color: #121719;
+    padding-left: 9em;
+    padding-right: 9em;
+    color: #ababab;
+    font-size: 87.5%; /* Base font size: 14px */
+    font-family: 'Trebuchet MS', Trebuchet, 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    line-height: 1.429;
+    margin: 0;
+    text-align: left;
+}
+
+header, footer {
+    margin-top: 1em;;
+    margin-bottom: 1em;
+    border-radius: 0.8em;
+    padding: 0em;
+    padding-bottom: 0.5em;
+    clear: both;
+    background-color: #32383b;
+    //box-shadow:2px 2px 4px 2px #111;
+    box-shadow: inset 0 0 10px #4c5659, 2px 2px 4px 2px #0e1217;
+}
+
+footer {
+    padding-left: 2em;
+    padding-top: 0.8em;
+    padding-bottom: 0.8em;
+    padding-right: 3em;
+    font-size: 80%;
+}
+
+nav {
+    display: inline-block;
+}
+
+article, .archive-bg {
+    margin-bottom: 1.4em;
+    margin-top: 1.4em;
+    background-color: #292f30;
+    border-radius: 0.8em;
+    padding-bottom: 0.8em;
+    padding-top: 0.8em;
+    padding-left: 2em;
+    padding-right: 3em;
+    box-shadow:2px 2px 4px 2px #0e1217, inset 0 0 10px #4c5659;
+}
+
+article>p {
+    margin: 0.4em;
+}
+
+article>.title, .archive-fg {
+    margin-left: -4em;
+    margin-top: 0.6em;
+    margin-bottom: 0.6em;
+    width: 110%; //TODO: would need something like: `width: 100% + 4em`;
+    padding-left: 4em;
+    border-radius: 0.8em;
+    background-color: #2e3436;
+    display: inline-block;
+    box-shadow: inset 0 0 10px #3b4245, 2px 2px 2px 0px #191c1e;
+}
+
+.sub-header {
+    font-size: 0.6em;
+    padding-left: 15px;
+    margin-top: 0.1em;
+}
+
+.docutils.literal {
+    /* 
+     * The inline code examples
+     * Would like to have an inline pygment thing
+     * and a non-pygment thing.
+     */
+    border-radius: 0.3em;
+    padding-left: 0.3em;
+    padding-right: 0.2em;
+    padding-top: 0.3em;
+    padding-bottom: 0.3em;
+    box-shadow: inset 0 0 3px #3b4245;
+    background-color: #2e3436;
+    //linear-gradient( 0deg, #3b4245, #2w3436 10%, red );
+}
+
+dt {
+    /* Definition term, see less: a love story */
+    font-weight: bold;
+}
+    
+
+pre {
+    /* 
+     * The code blocks 
+     */
+    background-color: #191c1e;
+    box-shadow:2px 2px 2px 0px #191c1e;
+    border-radius: 0.8em;
+    margin-left: 0em;
+    margin-right: 3em;
+    margin-top: 1em;
+    margin-bottom: 1em;
+    padding-left: 2em;
+    padding-right: 2em;
+    padding-top: 1em;
+    padding-bottom: 1em;
+    z-index: 10;  
+    overflow:hidden;
+    text-overflow:ellipsis; //TODO: Make it nicer
+}
+
+/* Headings */ 
+h1,h2 {
+    font-size: 2em;
+    font-variant: small-caps;
+    padding-left: 15px;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+    
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 200;
+    line-height: 1.1;
+    //margin-bottom: .8em;
+    font-family: 'Yanone Kaffeesatz', arial, serif;
+}
+
+h3, h4, h5, h6 { margin-top: .8em; }
+
+/* Anchors */
+a {
+    outline: 0;
+}
+a:link, a:visited {
+    color: #bfbfbf;
+    padding: 0 1px;
+    text-decoration: none;
+    box-shadow: inset 0 0 8pxi #dfdfdf;
+}
+p>a:link, a:visited {
+    border-radius: 0.3em;
+    padding-left: 0.3em; /* TODO: Move padding to <p>, for when link is wrapped to left */
+    padding-right: 0.3em;
+    box-shadow: inset 0 0 3px #3b4245, 2px 2px 2px 0px #561420;
+    background-color: #2e3436;
+}
+
+a:hover, a:active {
+    background-color: #3b4245;
+    color: #ababab;
+    text-decoration: none;
+    text-shadow: 1px 1px 1px #333;
+}
+    
+a#header, a.nav {
+    color: #ababab;
+    text-shadow: 1px 1px 1px #333;
+}
+
+a#header:hover, a#header:active, a.nav:hover, a.nav:active {
+    color: #cfcfcf;
+}
+a.nav {
+    margin-left: 1em;
+}
+
+
+
+/* Generated with pygment with solarized dark theme. 
+ * These lines are unnecessary: 
+ * td.linenos { background-color: #f0f0f0; padding-right: 10px; }
+ * span.lineno { background-color: #f0f0f0; padding: 0 5px 0 5px; }
+ * pre { line-height: 125%; }
+ *
+ */
+pre[class^="code"] >  .hll { background-color: #ffffcc }
+pre[class^="code"] >   { background: #002B36; color: #93A1A1 }
+pre[class^="code"] >  .c { color: #586E75 } /* Comment */
+pre[class^="code"] >  .err { color: #93A1A1 } /* Error */
+pre[class^="code"] >  .g { color: #93A1A1 } /* Generic */
+pre[class^="code"] >  .k { color: #859900 } /* Keyword */
+pre[class^="code"] >  .l { color: #93A1A1 } /* Literal */
+pre[class^="code"] >  .n { color: #93A1A1 } /* Name */
+pre[class^="code"] >  .o { color: #859900 } /* Operator */
+pre[class^="code"] >  .x { color: #CB4B16 } /* Other */
+pre[class^="code"] >  .p { color: #93A1A1 } /* Punctuation */
+pre[class^="code"] >  .cm { color: #586E75 } /* Comment.Multiline */
+pre[class^="code"] >  .cp { color: #859900 } /* Comment.Preproc */
+pre[class^="code"] >  .c1 { color: #586E75 } /* Comment.Single */
+pre[class^="code"] >  .cs { color: #859900 } /* Comment.Special */
+pre[class^="code"] >  .gd { color: #2AA198 } /* Generic.Deleted */
+pre[class^="code"] >  .ge { color: #93A1A1; font-style: italic } /* Generic.Emph */
+pre[class^="code"] >  .gr { color: #DC322F } /* Generic.Error */
+pre[class^="code"] >  .gh { color: #CB4B16 } /* Generic.Heading */
+pre[class^="code"] >  .gi { color: #859900 } /* Generic.Inserted */
+pre[class^="code"] >  .go { color: #93A1A1 } /* Generic.Output */
+pre[class^="code"] >  .gp { color: #93A1A1 } /* Generic.Prompt */
+pre[class^="code"] >  .gs { color: #93A1A1; font-weight: bold } /* Generic.Strong */
+pre[class^="code"] >  .gu { color: #CB4B16 } /* Generic.Subheading */
+pre[class^="code"] >  .gt { color: #93A1A1 } /* Generic.Traceback */
+pre[class^="code"] >  .kc { color: #CB4B16 } /* Keyword.Constant */
+pre[class^="code"] >  .kd { color: #268BD2 } /* Keyword.Declaration */
+pre[class^="code"] >  .kn { color: #859900 } /* Keyword.Namespace */
+pre[class^="code"] >  .kp { color: #859900 } /* Keyword.Pseudo */
+pre[class^="code"] >  .kr { color: #268BD2 } /* Keyword.Reserved */
+pre[class^="code"] >  .kt { color: #DC322F } /* Keyword.Type */
+pre[class^="code"] >  .ld { color: #93A1A1 } /* Literal.Date */
+pre[class^="code"] >  .m { color: #2AA198 } /* Literal.Number */
+pre[class^="code"] >  .s { color: #2AA198 } /* Literal.String */
+pre[class^="code"] >  .na { color: #93A1A1 } /* Name.Attribute */
+pre[class^="code"] >  .nb { color: #B58900 } /* Name.Builtin */
+pre[class^="code"] >  .nc { color: #268BD2 } /* Name.Class */
+pre[class^="code"] >  .no { color: #CB4B16 } /* Name.Constant */
+pre[class^="code"] >  .nd { color: #268BD2 } /* Name.Decorator */
+pre[class^="code"] >  .ni { color: #CB4B16 } /* Name.Entity */
+pre[class^="code"] >  .ne { color: #CB4B16 } /* Name.Exception */
+pre[class^="code"] >  .nf { color: #268BD2 } /* Name.Function */
+pre[class^="code"] >  .nl { color: #93A1A1 } /* Name.Label */
+pre[class^="code"] >  .nn { color: #93A1A1 } /* Name.Namespace */
+pre[class^="code"] >  .nx { color: #93A1A1 } /* Name.Other */
+pre[class^="code"] >  .py { color: #93A1A1 } /* Name.Property */
+pre[class^="code"] >  .nt { color: #268BD2 } /* Name.Tag */
+pre[class^="code"] >  .nv { color: #268BD2 } /* Name.Variable */
+pre[class^="code"] >  .ow { color: #859900 } /* Operator.Word */
+pre[class^="code"] >  .w { color: #93A1A1 } /* Text.Whitespace */
+pre[class^="code"] >  .mf { color: #2AA198 } /* Literal.Number.Float */
+pre[class^="code"] >  .mh { color: #2AA198 } /* Literal.Number.Hex */
+pre[class^="code"] >  .mi { color: #2AA198 } /* Literal.Number.Integer */
+pre[class^="code"] >  .mo { color: #2AA198 } /* Literal.Number.Oct */
+pre[class^="code"] >  .sb { color: #586E75 } /* Literal.String.Backtick */
+pre[class^="code"] >  .sc { color: #2AA198 } /* Literal.String.Char */
+pre[class^="code"] >  .sd { color: #93A1A1 } /* Literal.String.Doc */
+pre[class^="code"] >  .s2 { color: #2AA198 } /* Literal.String.Double */
+pre[class^="code"] >  .se { color: #CB4B16 } /* Literal.String.Escape */
+pre[class^="code"] >  .sh { color: #93A1A1 } /* Literal.String.Heredoc */
+pre[class^="code"] >  .si { color: #2AA198 } /* Literal.String.Interpol */
+pre[class^="code"] >  .sx { color: #2AA198 } /* Literal.String.Other */
+pre[class^="code"] >  .sr { color: #DC322F } /* Literal.String.Regex */
+pre[class^="code"] >  .s1 { color: #2AA198 } /* Literal.String.Single */
+pre[class^="code"] >  .ss { color: #2AA198 } /* Literal.String.Symbol */
+pre[class^="code"] >  .bp { color: #268BD2 } /* Name.Builtin.Pseudo */
+pre[class^="code"] >  .vc { color: #268BD2 } /* Name.Variable.Class */
+pre[class^="code"] >  .vg { color: #268BD2 } /* Name.Variable.Global */
+pre[class^="code"] >  .vi { color: #268BD2 } /* Name.Variable.Instance */
+pre[class^="code"] >  .il { color: #2AA198 } /* Literal.Number.Integer.Long */

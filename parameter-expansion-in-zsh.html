@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Parameter expansion in zsh</title>
+    <link rel="stylesheet" href="http://joepvd.github.io/theme/css/main.css">
+          <link href="http://joepvd.github.io/all.atom" type="application/atom+xml" rel="alternate" title="escape code Atom Feed" />
+          </head>
+
+  <body>
+    <header> 
+      <a href="http://joepvd.github.io/index.html" id=header>
+        <h1>
+          escape code         </h1>
+      </a>
+      <nav>
+                  <a class=nav href="http://joepvd.github.io/archives.html">Archives</a>
+                            <a class=nav href="http://joepvd.github.io/pages/about-this-website.html">About this website</a>
+                        </nav>
+    </header>
+
+    <section id="content" class="body">
+  <article>
+    <a          class="title"
+                href="http://joepvd.github.io/parameter-expansion-in-zsh.html" 
+                rel="bookmark" 
+                title="Permalink to Parameter expansion in zsh">
+      <h2>Parameter expansion in zsh</h2>
+      <p class=sub-header>
+        joepd, 2013-12-10
+              </p>
+    </a> <!-- /.article-title -->
+    <div class="content">
+      <p>The shell is a high quality text processor, and zsh is especially suited for that purpose.  In this post, I will show some of the tricks I use for an editing problem that I encounter every day.  Concretely: How to quickly generate queries, after receiving a list of IDs.  This is what the result should look like:</p>
+<pre class="code sql literal-block">
+<span class="k">select</span> <span class="o">*</span> <span class="k">from</span> <span class="k">table</span> <span class="k">where</span> <span class="n">ID</span> <span class="k">in</span> <span class="p">(</span><span class="s1">'1234'</span><span class="p">,</span> <span class="s1">'2345'</span><span class="p">,</span> <span class="s1">'3456'</span><span class="p">);</span>
+</pre>
+<p>A fast way to achieve this looks thusly:</p>
+<pre class="code console literal-block">
+<span class="gp">%</span> <span class="nv">ar</span><span class="o">=(</span>
+<span class="go">array&gt; 1234
+array&gt; 2345
+array&gt; 3456
+array&gt; )
+
+</span><span class="gp">%</span> print <span class="s2">&quot;select * from table where id in (${(j:, :)${(qq)ar[&#64;]}});&quot;</span>
+<span class="go">select * from table where id in ('1234', '2345', '3456');</span>
+</pre>
+<p>What is happening here? First I am creating an array of something I have available in my paste buffer: I type the name of an array, <cite>=</cite>, and <cite>(</cite>, and press enter. Then I paste a list of IDs, close it off with a <cite>)</cite>. Now the info is available at my fingertips. The second action, the print statement with the hardly memorable parameter expansion, is the main topic of this post.</p>
+<p>Shells provide convenience functions to do stuff with parameters, and <cite>zsh</cite> surely is the most advanced in this regard.  These parameter expansions are easiest to read from the inside to the outside, so let's have a look at <tt class="docutils literal"><span class="pre">${(qq)ar[&#64;]}</span></tt>.  This consists of two parts, <tt class="docutils literal"><span class="pre">${ar[&#64;]}</span></tt> and <tt class="docutils literal">(qq)</tt>.</p>
+<p>The result of <tt class="docutils literal"><span class="pre">${ar[&#64;]}</span></tt> is into all the elements of array <tt class="docutils literal">ar</tt>.  In any shell that conforms to POSIX, you can specify elements of an array by encapsulating them in square brackets: <tt class="docutils literal">${ar[2]}</tt> would be <tt class="docutils literal">2345</tt>.  One can use the <tt class="docutils literal">&#64;</tt> to say that you want all the indexes.</p>
+<p>In <tt class="docutils literal">zsh</tt>, if there is an opening bracket directly after the curly opening bracket, magic is immanent.  The bracketed characters are flags.  For a complete overview of what can be done, see <tt class="docutils literal">man zshexpn | less <span class="pre">+/'^</span> *Parameter Expansion Flags'</tt>. In this case, the members of <tt class="docutils literal">ar</tt> are treated with the action that is hiding behind the <tt class="docutils literal">qq</tt>.  The effect of this flag is quoted with single quotes.  (You can use three q's for double quotes).</p>
+<p>So the net result of the inner expansion is a copy of the arrat <tt class="docutils literal">ar</tt>, with the difference that the elements are quoted.  This is the intermediate result what the outer expansion, <tt class="docutils literal"><span class="pre">${(j:,</span> <span class="pre">:)…}</span></tt> is working with.  The flag <tt class="docutils literal">j</tt> is for joining the elements of an array, with whatever is between the colons as a separator, in our case a comma followed by space. The colons are arbitrary: If your join string contains colons itself, you can take a comma or a period, or whatever.</p>
+<p>The result is, as you have seen, that <tt class="docutils literal"><span class="pre">${(j:,</span> <span class="pre">:)${(qq)ar[&#64;]}}</span></tt> is expanded to a comma separated line of quoted elements of array <tt class="docutils literal">ar</tt>.  As I use this kind of expansion on a daily basis, and this expansion is a bit too tedious to type in every time, I spent a bit of time to make this expansion available at my finger tips in the form of a shell function <tt class="docutils literal">a2q</tt>:</p>
+<pre class="code sh literal-block">
+a2q <span class="o">()</span> <span class="o">{</span>
+        print <span class="k">${</span><span class="p">(j:, :)</span><span class="k">${</span><span class="p">(Pqq)1</span><span class="k">}</span><span class="p">[&#64;]</span><span class="k">}</span>
+<span class="o">}</span>
+</pre>
+<p>This can be used as follows:</p>
+<pre class="code console literal-block">
+<span class="gp">%</span> print <span class="s2">&quot;select * from table where id in ($(a2q ar));&quot;</span>
+</pre>
+<p>Compared to the interactive version, the array is a positional parameter: <tt class="docutils literal">$1</tt> is being expanded, so you can type: <tt class="docutils literal">a2q myarray</tt> to have <tt class="docutils literal">a2q</tt> work on <tt class="docutils literal">myarray</tt>. In order to make this work, an extra trick needed to be added:  The <cite>P</cite>-flag has been added to the inner parameter expansion flags. This makes that the resulting string is considered to be a parameter.</p>
+<p>This works great, but it can be generalized.  Sometimes the list of IDs is given as an file.  By virtue of the <cite>f</cite>-flag, the following snippet loads the newline separated contents of file <cite>file</cite> into array <cite>array</cite>:</p>
+<pre class="code sh literal-block">
+<span class="nv">array</span><span class="o">=(</span> <span class="k">${</span><span class="p">(f)</span><span class="k">$(</span>&lt;file<span class="k">)}</span> <span class="o">)</span>
+</pre>
+<p>Just to facilitate laziness, the function a2q can be expanded to check what type of argument it got, and based on that, populate a temporary array with infos. Multiple arguments are allowed. If no argument is provided, a2q will listen to STDIN, so you can pipe the output of another command to it. After all the processing, the last step is to print the contents of the array in the desired way:</p>
+<pre class="code sh literal-block">
+emulate -L zsh
+<span class="nb">typeset</span> -U ar
+<span class="nv">ar</span><span class="o">=()</span>
+_err<span class="o">()</span> <span class="o">{</span>
+    <span class="nb">echo</span> <span class="s2">&quot;Do not understand: ${1}&quot;</span> &gt;&amp;2
+    <span class="nb">echo</span> <span class="s2">&quot;Arguments need to be files, names of arrays, or standard input.&quot;</span> &gt;&amp;2
+    <span class="nb">echo</span> <span class="s1">'Arrays must be referenced by name, so use `array` instead of `$array`.'</span> &gt;&amp;2
+    <span class="nb">exit </span>1
+<span class="o">}</span>
+
+<span class="k">if</span> <span class="o">[[</span> <span class="nv">$# </span><span class="o">==</span> 0 <span class="o">]]</span>; <span class="k">then</span>
+    <span class="c"># Listen to STDIN if no arguments are provided
+</span>    <span class="nv">ar</span><span class="o">=(</span> <span class="k">${</span><span class="p">(f)</span><span class="k">$(</span>&lt;&amp;0<span class="k">)}</span> <span class="o">)</span>
+<span class="k">fi
+
+while</span> <span class="o">[[</span> <span class="nv">$# </span>&gt; 0 <span class="o">]]</span>; <span class="k">do
+    if</span> <span class="o">[[</span> -r <span class="s2">&quot;$1&quot;</span> <span class="o">&amp;&amp;</span> -f <span class="s2">&quot;$1&quot;</span> <span class="o">]]</span>; <span class="k">then</span>
+        <span class="c"># A readable file.
+</span>        <span class="nv">ar</span><span class="o">=(</span>
+            <span class="nv">$ar</span><span class="o">[</span>&#64;<span class="o">]</span>
+            <span class="s2">&quot;${(fq)$(&lt;$1)}&quot;</span>
+        <span class="o">)</span>
+    <span class="k">elif</span> <span class="o">[[</span> <span class="k">${</span><span class="p">(Pt)1</span><span class="k">}</span> <span class="o">=</span> <span class="s2">&quot;array&quot;</span> <span class="o">]]</span>; <span class="k">then
+        </span><span class="nv">ar</span><span class="o">=(</span>
+            <span class="nv">$ar</span><span class="o">[</span>&#64;<span class="o">]</span>
+            <span class="k">${</span><span class="p">(Pq)1</span><span class="k">}</span>
+        <span class="o">)</span>
+    <span class="k">else
+        </span>_err
+    <span class="k">fi
+    </span><span class="nb">shift
+</span><span class="k">done
+
+</span>print <span class="k">${</span><span class="p">(j:, :)</span><span class="k">${</span><span class="p">(qq)ar[&#64;]</span><span class="k">}}</span>
+</pre>
+<p>I stored the above as <tt class="docutils literal">a2q</tt> in a <a class="reference external" href="http://zsh.sourceforge.net/Doc/Release/Functions.html#Autoloading-Functions">directory whose contents gets autoloaded</a> when required, so I have it available at my finger tips.</p>
+<p>Enjoy!</p>
+
+    </div>
+  </article>
+</section>
+
+    <footer>
+      <address id="about" class="vcard body">
+        Powered by <a href="http://getpelican.com/">Pelican</a>. 
+      </address><!-- /#about -->
+
+      <p>
+      All rights reserved. All wrongs reversed. All is released in the public
+      domain. 
+      </p>
+    </footer>
+  </body>
+</html>
