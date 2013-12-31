@@ -1,5 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>escape code</title><link href="http://joepvd.github.io/" rel="alternate"></link><link href="http://joepvd.github.io/all.atom" rel="self"></link><id>http://joepvd.github.io/</id><updated>2013-12-27T00:00:00+01:00</updated><entry><title>less: a love story</title><link href="http://joepvd.github.io/less-a-love-story.html" rel="alternate"></link><updated>2013-12-27T00:00:00+01:00</updated><author><name>joepd</name></author><id>tag:joepvd.github.io,2013-12-27:less-a-love-story.html</id><summary type="html">&lt;p&gt;Less. I use it more and more.  I would not be surprised if at least a fourth of my time in a console window actually is spent within less.  It is just a pager, you say?  True, but one that has been in &lt;a class="reference external" href="http://www.greenwoodsoftware.com/less/index.html"&gt;active development&lt;/a&gt; since 1983. The original developer currently is still the maintainer.  You don't need to be an experimental archeologist to put this tool to use. Getting acquainted to this pager will pay itself off pretty fast.&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>escape code</title><link href="http://joepvd.github.io/" rel="alternate"></link><link href="http://joepvd.github.io/all.atom" rel="self"></link><id>http://joepvd.github.io/</id><updated>2013-12-31T00:00:00+01:00</updated><entry><title>readline and psql</title><link href="http://joepvd.github.io/readline-and-psql.html" rel="alternate"></link><updated>2013-12-31T00:00:00+01:00</updated><author><name>joepd</name></author><id>tag:joepvd.github.io,2013-12-31:readline-and-psql.html</id><summary type="html">&lt;p&gt;One of the nicer feautures of PostgresQL is its client: psql.  This nifty console application has builtin readline support.  As I am spending so much time in psql sessions, it is worth to learn how to abuse the readline library for some key board magic.&lt;/p&gt;
+&lt;p&gt;Readline is what you are actually working with (or against!) in an interactive Bash session. ZSH has its own infrastructure for interaction, but there are quite some applications besides Bash which make use of this interaction infrastructure.  A basic list of readline keyboard shortcuts has been compiled at &lt;a class="reference external" href="http://www.bigsmoke.us/readline/shortcuts"&gt;this page&lt;/a&gt;, and most of these will be in the muscle memory of console warriors.  Suffice to say that this is just a part of the default configuration, see &lt;tt class="docutils literal"&gt;man 3 readline&lt;/tt&gt; for some more possibilities.&lt;/p&gt;
+&lt;p&gt;If you find that you are typing often the same thing in a readline supported application, you might be interested to hear that Readline kindly offers to do the typing for you.   These are called keyboard macros, and are configured in readline's configuration file: &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;~/.inputrc&lt;/span&gt;&lt;/tt&gt;.&lt;/p&gt;
+&lt;p&gt;The following is very useful, almost taken directly from &lt;tt class="docutils literal"&gt;man 3 readline&lt;/tt&gt;. If you put this in &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;~/.inputrc&lt;/span&gt;&lt;/tt&gt;, pressing &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;Alt-q&lt;/span&gt;&lt;/tt&gt; will put single quotes around the word currently under the cursor:&lt;/p&gt;
+&lt;pre class="code sh literal-block"&gt;
+&lt;span class="s2"&gt;&amp;quot;^[q&amp;quot;&lt;/span&gt;: &lt;span class="s2"&gt;&amp;quot;^[b\'^[f\'&amp;quot;&lt;/span&gt;
+&lt;/pre&gt;
+&lt;p&gt;This looks cryptic, so let's have a closer look.  Before &lt;tt class="docutils literal"&gt;:&lt;/tt&gt; is the key combination that triggers the action after the colon. &lt;tt class="docutils literal"&gt;^[q&lt;/tt&gt; translates into &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;Alt-q&lt;/span&gt;&lt;/tt&gt;, so that will trigger the action.&lt;/p&gt;
+&lt;p&gt;But how do you know that &lt;tt class="docutils literal"&gt;^[q&lt;/tt&gt; happens to represent &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;Alt-q&lt;/span&gt;&lt;/tt&gt;?  The good news is that you don't, when you use the following method in &lt;tt class="docutils literal"&gt;vim&lt;/tt&gt; to generate the escape code.  In insert mode, press &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;CTRL-V&lt;/span&gt;&lt;/tt&gt;. This will tell vim to put literally what comes next.  If you press &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;Alt-q&lt;/span&gt;&lt;/tt&gt; directly after &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;CTRL-v&lt;/span&gt;&lt;/tt&gt;, this sequence will show up, and that is all there is to it.  You will notice, that when moving the cursor over the &lt;tt class="docutils literal"&gt;^[&lt;/tt&gt;, the cursor will jump over the two signs as if it is one.  That is because it _is_ one character.  Copy pasting these escape sequences into your editor most likely will not work.&lt;/p&gt;
+&lt;p&gt;So what about the action after the colon? This is a sequence that you can type literally in &lt;tt class="docutils literal"&gt;psql&lt;/tt&gt;.  Press &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;Alt-b&lt;/span&gt;&lt;/tt&gt; (bound to &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;backward-word&lt;/span&gt;&lt;/tt&gt;), then type a single quote (which in &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;~/.inputrc&lt;/span&gt;&lt;/tt&gt; needs to be escaped by a backslash).  Continue by pressing &lt;tt class="docutils literal"&gt;Alt+f&lt;/tt&gt;, which brings you to the end of the word, where another single quote is inserted.  Result:  The current word is quoted.  With this configuration in place, you just need to press one key combination, instead of needing complicated eye-hand coordination to move cursor to where it should be.&lt;/p&gt;
+&lt;p&gt;As I am working with a horribly normalized datamodel where finding what one needs can take an icredible amount of time, I often query the system tables from postgres to navigate in the database.  A question that I keep repeating to ask, is: In which tables does this column name appear? A valuable indicator for the role of the table is the amount of information it contains.  The following query helps me a lot to quickly find what I am actually looking for:&lt;/p&gt;
+&lt;pre class="code sql literal-block"&gt;
+&lt;span class="k"&gt;select&lt;/span&gt; &lt;span class="k"&gt;distinct&lt;/span&gt;
+    &lt;span class="n"&gt;relname&lt;/span&gt; &lt;span class="k"&gt;as&lt;/span&gt; &lt;span class="k"&gt;table&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="n"&gt;reltuples&lt;/span&gt; &lt;span class="k"&gt;as&lt;/span&gt; &lt;span class="n"&gt;rowcount&lt;/span&gt;
+&lt;span class="k"&gt;from&lt;/span&gt; &lt;span class="n"&gt;information_schema&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;columns&lt;/span&gt; &lt;span class="k"&gt;as&lt;/span&gt; &lt;span class="n"&gt;cols&lt;/span&gt;
+&lt;span class="k"&gt;join&lt;/span&gt; &lt;span class="n"&gt;pg_class&lt;/span&gt; &lt;span class="k"&gt;on&lt;/span&gt; &lt;span class="n"&gt;pg_class&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;relname&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;cols&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="k"&gt;table_name&lt;/span&gt;
+&lt;span class="k"&gt;where&lt;/span&gt; &lt;span class="k"&gt;column_name&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;'name-of-column'&lt;/span&gt;
+    &lt;span class="k"&gt;and&lt;/span&gt; &lt;span class="n"&gt;reltuples&lt;/span&gt; &lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;
+&lt;span class="k"&gt;order&lt;/span&gt; &lt;span class="k"&gt;by&lt;/span&gt; &lt;span class="n"&gt;reltuples&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/pre&gt;
+&lt;p&gt;It is a bit of a nuisance to need to edit this text often to enter the column that I am looking for. With the following line, I can type the column on the command line, and after pressing &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;Alt-c&lt;/span&gt;&lt;/tt&gt; (for columns), the following happens:&lt;/p&gt;
+&lt;pre class="code console literal-block"&gt;
+&lt;span class="go"&gt;=&amp;gt; colname&amp;lt;Alt-c&amp;gt;
+=&amp;gt; select distinct
+-&amp;gt;   relname as table,
+-&amp;gt;   reltuples as rowcount
+-&amp;gt; from information_schema.columns as cols
+-&amp;gt; join pg_class on pg_class.relname = cols.table_name
+-&amp;gt; where column_name = 'colname'
+-&amp;gt;   and reltuples &amp;gt; 0
+-&amp;gt; order by reltuples;
+┌─────────────┬──────────┐
+│    table    │ rowcount │
+├─────────────┼──────────┤
+│ table1      │        7 │
+│ table2      │       10 │
+│ table3      │       22 │
+│ table4      │       80 │
+│ table5      │      126 │
+│ table6      │    13460 │
+│ table7      │    50112 │
+└─────────────┴──────────┘
+(7 rows)&lt;/span&gt;
+&lt;/pre&gt;
+&lt;p&gt;The following, admittedly very ugly, line in &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;~.,inputc&lt;/span&gt;&lt;/tt&gt; makes this possible:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="s2"&gt;&amp;quot;^[c&amp;quot;&lt;/span&gt;: &lt;span class="s2"&gt;&amp;quot;\C-a\C-kselect distinct\n  relname as table,\n  reltuples as rowcount \nfrom information_schema.columns as cols \njoin pg_class on pg_class.relname = cols.table_name \nwhere column_name = &amp;#39;\C-y&amp;#39;\n  and reltuples &amp;gt; 0 \norder by reltuples;\n&amp;quot;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;dl class="docutils"&gt;
+&lt;dt&gt;CTRL+a:&lt;/dt&gt;
+&lt;dd&gt;The cursor is moved to the start of the line.&lt;/dd&gt;
+&lt;dt&gt;CTRL+k:&lt;/dt&gt;
+&lt;dd&gt;Everything starting from the cursor until the end of the line is killed, or deleted and stored in the kill buffer.&lt;/dd&gt;
+&lt;/dl&gt;
+&lt;p&gt;Then, a lot of typing happens, including newlines, and some spacing. Until just after the first quote.&lt;/p&gt;
+&lt;dl class="docutils"&gt;
+&lt;dt&gt;CTRL+y:&lt;/dt&gt;
+&lt;dd&gt;The contents of the kill buffer is yanked in place&lt;/dd&gt;
+&lt;/dl&gt;
+&lt;p&gt;...and some conluding typing happens.&lt;/p&gt;
+&lt;p&gt;This keyboard shortcut does not make a lot of sense in any other program than &lt;tt class="docutils literal"&gt;psql&lt;/tt&gt;. Luckily, you can select the program for which this shortcut is available by encapsulating the configuration as follows:&lt;/p&gt;
+&lt;pre class="code sh literal-block"&gt;
+&lt;span class="nv"&gt;$if&lt;/span&gt; psql
+    &lt;span class="c"&gt;# some configuration
+&lt;/span&gt;&lt;span class="nv"&gt;$endif&lt;/span&gt;
+&lt;/pre&gt;
+&lt;p&gt;This way, you can reprogram all your keys, including function keys!, to do something useful.&lt;/p&gt;
+</summary></entry><entry><title>less: a love story</title><link href="http://joepvd.github.io/less-a-love-story.html" rel="alternate"></link><updated>2013-12-27T00:00:00+01:00</updated><author><name>joepd</name></author><id>tag:joepvd.github.io,2013-12-27:less-a-love-story.html</id><summary type="html">&lt;p&gt;Less. I use it more and more.  I would not be surprised if at least a fourth of my time in a console window actually is spent within less.  It is just a pager, you say?  True, but one that has been in &lt;a class="reference external" href="http://www.greenwoodsoftware.com/less/index.html"&gt;active development&lt;/a&gt; since 1983. The original developer currently is still the maintainer.  You don't need to be an experimental archeologist to put this tool to use. Getting acquainted to this pager will pay itself off pretty fast.&lt;/p&gt;
 &lt;p&gt;If you haven't done so yet, have a look at &lt;tt class="docutils literal"&gt;man 1 less&lt;/tt&gt;. The synopsis looks like Sesamestreet episode with brain damage:&lt;/p&gt;
 &lt;pre class="code sh literal-block"&gt;
 less &lt;span class="o"&gt;[&lt;/span&gt;-&lt;span class="o"&gt;[&lt;/span&gt;+&lt;span class="o"&gt;]&lt;/span&gt;aABcCdeEfFgGiIJKLmMnNqQrRsSuUVwWX~&lt;span class="o"&gt;]&lt;/span&gt;

@@ -46,6 +46,10 @@ nav {
     display: inline-block;
 }
 
+img {
+    vertical-align: middle
+}
+
 article, .archive-bg {
     margin-bottom: 1.4em;
     margin-top: 1.4em;

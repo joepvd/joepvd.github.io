@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>readline and psql</title>
+    <link rel="stylesheet" href="http://joepvd.github.io/theme/css/main.css">
+          <link href="http://joepvd.github.io/all.atom" type="application/atom+xml" rel="alternate" title="escape code Atom Feed" />
+          </head>
+
+  <body>
+    <header> 
+      <a href="http://joepvd.github.io/index.html" id=header>
+        <h1>
+          escape code         </h1>
+      </a>
+      <nav>
+                  <a class=nav href="http://joepvd.github.io/archives.html">Archives</a>
+                            <a class=nav href="http://joepvd.github.io/pages/about-this-website.html">About this website</a>
+                                    <a href="http://joepvd.github.io/all.atom"
+            type="application/atom+xml" rel="alternate" title="escape code
+            Atom Feed">
+            <img 
+              src="http://joepvd.github.io/theme/images/icons/rss.png"
+              alt="Atom feed" 
+              width="20px"
+              height="20px"
+            />
+          </a>
+              </nav>
+    </header>
+
+    <section id="content" class="body">
+  <article>
+    <a          class="title"
+                href="http://joepvd.github.io/readline-and-psql.html" 
+                rel="bookmark" 
+                title="Permalink to readline and psql">
+      <h2>readline and psql</h2>
+      <p class=sub-header>
+        joepd, 31 December 2013
+              </p>
+    </a> <!-- /.article-title -->
+    <div class="content">
+      <p>One of the nicer feautures of PostgresQL is its client: psql.  This nifty console application has builtin readline support.  As I am spending so much time in psql sessions, it is worth to learn how to abuse the readline library for some key board magic.</p>
+<p>Readline is what you are actually working with (or against!) in an interactive Bash session. ZSH has its own infrastructure for interaction, but there are quite some applications besides Bash which make use of this interaction infrastructure.  A basic list of readline keyboard shortcuts has been compiled at <a class="reference external" href="http://www.bigsmoke.us/readline/shortcuts">this page</a>, and most of these will be in the muscle memory of console warriors.  Suffice to say that this is just a part of the default configuration, see <tt class="docutils literal">man 3 readline</tt> for some more possibilities.</p>
+<p>If you find that you are typing often the same thing in a readline supported application, you might be interested to hear that Readline kindly offers to do the typing for you.   These are called keyboard macros, and are configured in readline's configuration file: <tt class="docutils literal"><span class="pre">~/.inputrc</span></tt>.</p>
+<p>The following is very useful, almost taken directly from <tt class="docutils literal">man 3 readline</tt>. If you put this in <tt class="docutils literal"><span class="pre">~/.inputrc</span></tt>, pressing <tt class="docutils literal"><span class="pre">Alt-q</span></tt> will put single quotes around the word currently under the cursor:</p>
+<pre class="code sh literal-block">
+<span class="s2">&quot;^[q&quot;</span>: <span class="s2">&quot;^[b\'^[f\'&quot;</span>
+</pre>
+<p>This looks cryptic, so let's have a closer look.  Before <tt class="docutils literal">:</tt> is the key combination that triggers the action after the colon. <tt class="docutils literal">^[q</tt> translates into <tt class="docutils literal"><span class="pre">Alt-q</span></tt>, so that will trigger the action.</p>
+<p>But how do you know that <tt class="docutils literal">^[q</tt> happens to represent <tt class="docutils literal"><span class="pre">Alt-q</span></tt>?  The good news is that you don't, when you use the following method in <tt class="docutils literal">vim</tt> to generate the escape code.  In insert mode, press <tt class="docutils literal"><span class="pre">CTRL-V</span></tt>. This will tell vim to put literally what comes next.  If you press <tt class="docutils literal"><span class="pre">Alt-q</span></tt> directly after <tt class="docutils literal"><span class="pre">CTRL-v</span></tt>, this sequence will show up, and that is all there is to it.  You will notice, that when moving the cursor over the <tt class="docutils literal">^[</tt>, the cursor will jump over the two signs as if it is one.  That is because it _is_ one character.  Copy pasting these escape sequences into your editor most likely will not work.</p>
+<p>So what about the action after the colon? This is a sequence that you can type literally in <tt class="docutils literal">psql</tt>.  Press <tt class="docutils literal"><span class="pre">Alt-b</span></tt> (bound to <tt class="docutils literal"><span class="pre">backward-word</span></tt>), then type a single quote (which in <tt class="docutils literal"><span class="pre">~/.inputrc</span></tt> needs to be escaped by a backslash).  Continue by pressing <tt class="docutils literal">Alt+f</tt>, which brings you to the end of the word, where another single quote is inserted.  Result:  The current word is quoted.  With this configuration in place, you just need to press one key combination, instead of needing complicated eye-hand coordination to move cursor to where it should be.</p>
+<p>As I am working with a horribly normalized datamodel where finding what one needs can take an icredible amount of time, I often query the system tables from postgres to navigate in the database.  A question that I keep repeating to ask, is: In which tables does this column name appear? A valuable indicator for the role of the table is the amount of information it contains.  The following query helps me a lot to quickly find what I am actually looking for:</p>
+<pre class="code sql literal-block">
+<span class="k">select</span> <span class="k">distinct</span>
+    <span class="n">relname</span> <span class="k">as</span> <span class="k">table</span><span class="p">,</span>
+    <span class="n">reltuples</span> <span class="k">as</span> <span class="n">rowcount</span>
+<span class="k">from</span> <span class="n">information_schema</span><span class="p">.</span><span class="n">columns</span> <span class="k">as</span> <span class="n">cols</span>
+<span class="k">join</span> <span class="n">pg_class</span> <span class="k">on</span> <span class="n">pg_class</span><span class="p">.</span><span class="n">relname</span> <span class="o">=</span> <span class="n">cols</span><span class="p">.</span><span class="k">table_name</span>
+<span class="k">where</span> <span class="k">column_name</span> <span class="o">=</span> <span class="s1">'name-of-column'</span>
+    <span class="k">and</span> <span class="n">reltuples</span> <span class="o">&gt;</span> <span class="mi">0</span>
+<span class="k">order</span> <span class="k">by</span> <span class="n">reltuples</span><span class="p">;</span>
+</pre>
+<p>It is a bit of a nuisance to need to edit this text often to enter the column that I am looking for. With the following line, I can type the column on the command line, and after pressing <tt class="docutils literal"><span class="pre">Alt-c</span></tt> (for columns), the following happens:</p>
+<pre class="code console literal-block">
+<span class="go">=&gt; colname&lt;Alt-c&gt;
+=&gt; select distinct
+-&gt;   relname as table,
+-&gt;   reltuples as rowcount
+-&gt; from information_schema.columns as cols
+-&gt; join pg_class on pg_class.relname = cols.table_name
+-&gt; where column_name = 'colname'
+-&gt;   and reltuples &gt; 0
+-&gt; order by reltuples;
+┌─────────────┬──────────┐
+│    table    │ rowcount │
+├─────────────┼──────────┤
+│ table1      │        7 │
+│ table2      │       10 │
+│ table3      │       22 │
+│ table4      │       80 │
+│ table5      │      126 │
+│ table6      │    13460 │
+│ table7      │    50112 │
+└─────────────┴──────────┘
+(7 rows)</span>
+</pre>
+<p>The following, admittedly very ugly, line in <tt class="docutils literal"><span class="pre">~.,inputc</span></tt> makes this possible:</p>
+<div class="highlight"><pre><span class="s2">&quot;^[c&quot;</span>: <span class="s2">&quot;\C-a\C-kselect distinct\n  relname as table,\n  reltuples as rowcount \nfrom information_schema.columns as cols \njoin pg_class on pg_class.relname = cols.table_name \nwhere column_name = &#39;\C-y&#39;\n  and reltuples &gt; 0 \norder by reltuples;\n&quot;</span>
+</pre></div>
+<dl class="docutils">
+<dt>CTRL+a:</dt>
+<dd>The cursor is moved to the start of the line.</dd>
+<dt>CTRL+k:</dt>
+<dd>Everything starting from the cursor until the end of the line is killed, or deleted and stored in the kill buffer.</dd>
+</dl>
+<p>Then, a lot of typing happens, including newlines, and some spacing. Until just after the first quote.</p>
+<dl class="docutils">
+<dt>CTRL+y:</dt>
+<dd>The contents of the kill buffer is yanked in place</dd>
+</dl>
+<p>...and some conluding typing happens.</p>
+<p>This keyboard shortcut does not make a lot of sense in any other program than <tt class="docutils literal">psql</tt>. Luckily, you can select the program for which this shortcut is available by encapsulating the configuration as follows:</p>
+<pre class="code sh literal-block">
+<span class="nv">$if</span> psql
+    <span class="c"># some configuration
+</span><span class="nv">$endif</span>
+</pre>
+<p>This way, you can reprogram all your keys, including function keys!, to do something useful.</p>
+
+    </div>
+  </article>
+</section>
+
+    <footer>
+      <address id="about" class="vcard body">
+        Powered by <a href="http://getpelican.com/">Pelican</a>. 
+      </address><!-- /#about -->
+
+      <p>
+      All rights reserved. All wrongs reversed. All is released in the public
+      domain. 
+      </p>
+    </footer>
+  </body>
+</html>
