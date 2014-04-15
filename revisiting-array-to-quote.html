@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Revisiting array-to-quote</title>
+    <link rel="stylesheet" href="http://joepvd.github.io/theme/css/main.css">
+      <link href="http://joepvd.github.io/all.atom" type="application/atom+xml" rel="alternate" title="escape code Atom Feed" />
+  </head>
+
+  <body>
+    <header> 
+      <a href="http://joepvd.github.io/index.html" id=header>
+        <h1>
+          escape code         </h1>
+      </a>
+      <nav>
+          <a class=nav href="http://joepvd.github.io/archives.html">Archives</a>
+            <a class=nav href="http://joepvd.github.io/pages/about-this-website.html">About this website</a>
+          <a href="http://joepvd.github.io/all.atom"
+            type="application/atom+xml" rel="alternate" title="escape code
+            Atom Feed">
+            <img 
+              src="http://joepvd.github.io/theme/images/icons/rss.png"
+              alt="Atom feed" 
+              width="20px"
+              height="20px"
+            />
+          </a>
+      </nav>
+    </header>
+
+<section id="content" class="body">
+  <article>
+    <a          class="title"
+                href="http://joepvd.github.io/revisiting-array-to-quote.html" 
+                rel="bookmark" 
+                title="Permalink to Revisiting array-to-quote">
+      <h2>Revisiting array-to-quote</h2>
+      <p class=sub-header>
+        joepd, 15 April 2014
+      </p>
+    </a> <!-- /.article-title -->
+    <div class="content">
+      <p>Computing professionals are in some way similar to athletes and musicians: Continued practicing sessions makes them better at what they do.  Interestingly, it seems that there is not so much a culture of inconsequential coding sessions to sharpen your skills.  Dave Thomas practices what he preaches with <a class="reference external" href="http://codekata.com">Code kata</a>'s.</p>
+<p>The nice part about repetitive tasks, is that there is a reason to automate 'em.  And when the automated solution starts to feel like a drag, it's time to improve the solution.  Repetitive tasks lend themselves very well to katas.  You probably know the corner cases, and have some ideas of what would suit your work flow.  Continued study of the mechanics of simple manipulations really can get you forward.  As an addition to the metaphor of kata's, I'd like to propose to think about the wood worker sharpening his tools.</p>
+<p>That was more than enough meta for an introduction to pretty down-to-earth stuff.  As I regularly have to shape one output in a quoted, comma separated list, I came to revisit the solution posted in my <a class="reference external" href="http://joepvd.github.io/parameter-expansion-in-zsh.html">first post</a>.  This time, I set myself to make a keyboard shortcut that operates on the closest word to the cursor in a terminal running zsh.</p>
+<p>Just drop this part in your <tt class="docutils literal"><span class="pre">~/.zshrc</span></tt>, and you should have that short moment of gratification when it seems that the computer is obeying your will at the gentlest of gestures:</p>
+<pre class="code sh literal-block">
+array-to-quote<span class="o">()</span> <span class="o">{</span>
+    autoload -U modify-current-argument
+    modify-current-argument <span class="s1">'$(
+        if [[ ${(Pt)ARG} = &quot;array&quot; ]]; then
+            print ${(j., .)${(qq)${(P)ARG}}}
+        elif [[ -r $ARG ]]; then
+            print ${(j., .)${(qq)${(f)&quot;$(&lt;$ARG)&quot;}}}
+        else
+            print ${(qq)ARG}
+        fi
+    )'</span>
+<span class="o">}</span>
+zle -N array-to-quote
+<span class="c"># Terminal: Stop stealing CTRL-q and CTRL-s!
+</span>stty start <span class="s1">'^-'</span> stop <span class="s1">'^-'</span>
+bindkey <span class="s2">&quot;^q&quot;</span> array-to-quote
+</pre>
+<p>If you copy-paste this into your zsh, and press <tt class="docutils literal"><span class="pre">CTRL-q</span></tt>, the word under your cursor will become quoted. If that word happens to be a file, the lines of that file will appear as a quoted list.  If the word i an array, the elements are added nicely quoted and comma separated.  Nice huh?</p>
+<p>So, what is actually happening in these few lines?</p>
+<p>First, a function is defined, that uses a function usually distributed with <tt class="docutils literal">zsh</tt>: <tt class="docutils literal"><span class="pre">modify-current-argument</span></tt>.  This function takes a function as an argument, and as a bonus, this function can use the variable <tt class="docutils literal">$ARG</tt>: the word under or left of the cursor.  Have a look at <tt class="docutils literal">man zshcontrib</tt> for a complete description.</p>
+<p>The function that <tt class="docutils literal"><span class="pre">modify-current-argument</span></tt> calls, make use of parameter expansion flags, and you should be able to follow along after reading my earlier post on the topic.</p>
+<p>Now we have a function that takes the word under the cursor as an argument.  This we need to have as a keyboard shortcut.  <tt class="docutils literal">zle <span class="pre">-N</span> <span class="pre">function-name</span></tt> does the first part: It makes the function <tt class="docutils literal"><span class="pre">function-name</span></tt> availabe as a command line editing <strong>widget</strong>.  This widget is in turn bound to <tt class="docutils literal">CTRL q</tt> with the <tt class="docutils literal">bindkey</tt> statement.  There happened to be something special about <tt class="docutils literal"><span class="pre">CTRL-Q</span></tt>:  I needed to tell the terminal driver to not listen to a functionality that I have never knowingly used with the <tt class="docutils literal">stty</tt>-command.  Please tell me if I miss out on cool stuff...</p>
+<p>But wait a sec.  There is this other thing that I regularly do:  To make a regular expression from some kind of list.  This is what does that trick, and binds it under <tt class="docutils literal">CTRL \</tt>:</p>
+<pre class="code sh literal-block">
+array-to-pipe<span class="o">()</span> <span class="o">{</span>
+    autoload -U modify-current-argument
+    modify-current-argument <span class="s1">'$(
+        if [[ ${(Pt)ARG} = &quot;array&quot; ]]; then
+            print ${(j.|.)${(P)ARG}}
+        elif [[ -r $ARG ]]; then
+            print ${(j.|.)${(f)&quot;$(&lt;$ARG)&quot;}}
+        else
+            print ${ARG}
+        fi
+    )'</span>
+<span class="o">}</span>
+zle -N array-to-pipe
+bindkey <span class="err">'</span>^<span class="se">\'</span> array-to-pipe
+</pre>
+<p>Keep sharpening your knives :)</p>
+
+    </div>
+  </article>
+</section>
+
+    <footer>
+      <address id="about" class="vcard body">
+        Powered by <a href="http://getpelican.com/">Pelican</a>. 
+      </address><!-- /#about -->
+
+      <p>
+      All rights reserved. All wrongs reversed. All is released in the public
+      domain. 
+      </p>
+    </footer>
+  </body>
+</html>
