@@ -28,7 +28,7 @@ f&lt;span class="o"&gt;[&lt;/span&gt;+&lt;span class="o"&gt;=&lt;/span&gt;-&lt;s
 &lt;span class="o"&gt;{&lt;/span&gt;u,g&lt;span class="o"&gt;}&lt;/span&gt;:name: ▶ owned by user, group name &lt;span class="sb"&gt;`&lt;/span&gt;name&lt;span class="sb"&gt;`&lt;/span&gt;
    ...18 hints omitted.
 &lt;/pre&gt;
-&lt;p&gt;A quick glance will help you conclude that &lt;tt class="docutils literal"&gt;(.sW)&lt;/tt&gt; is what you are looking for.&lt;/p&gt;
+&lt;p&gt;A quick glance will help you conclude that &lt;tt class="docutils literal"&gt;(.GW)&lt;/tt&gt; is what you are looking for.&lt;/p&gt;
 &lt;p&gt;This example was made on a rather small terminal.  That is why some of the explanations were wrapped, and were displayed with a secondary separator of just a space. It also did not fit in the vertical direction.  An optional message notifying how much you are missing on is displayed.&lt;/p&gt;
 &lt;p&gt;The key file is really simple to make: It just assumes that the first space separates the key from the explanation. There is no way of putting a space in the key.&lt;/p&gt;
 &lt;p&gt;All the details of installation and configuration are covered in the &lt;a class="reference external" href="https://github.com/joepvd/zsh-hints"&gt;README&lt;/a&gt;. Please let me know if it does or does not work for you.&lt;/p&gt;
