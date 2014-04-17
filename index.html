@@ -34,6 +34,50 @@
 
         
         <article>
+          <a class="title" href="http://joepvd.github.io/zsh-learn-while-doing.html">
+            <h2>zsh: learn while doing</h2>
+            <p class=sub-header>
+              joepd, 17 April 2014
+            </p>
+          </a> <!-- /"article-title --> 
+          <p>What good are advanced and hard to remember features if there is no help available at a fingertip?  Globbing in zsh might be the best thing since sliced bread, but if you don't know the details, you might as well be chewing on a brick.</p>
+<p>So, why not organize in such a way so that the details are readily available?  One of the many nice ideas from feh's <a class="reference external" href="http://git.plenz.com/configs/plain/.zsh/zshrc">excellent zsh configuration file</a> does exactly that, but it looked ugly on a too small terminal, and it looks like quite some manual work to format the information in <tt class="docutils literal"><span class="pre">~/.zshrc</span></tt>.  So I made <a class="reference external" href="https://github.com/joepvd/zsh-hints">zsh-hints</a>, a small helper program that turns a definition file into helpful hints.</p>
+<p>Who can remember all those <a class="reference external" href="http://zsh.sourceforge.net/Doc/Release/Expansion.html#Glob-Operators">glob flags</a>?  Imagine wanting to see the Setgid, and world readable files in somewhere here in a subdirectory. Just hit <tt class="docutils literal">&lt;CTRL <span class="pre">X&gt;&lt;g&gt;</span></tt> …</p>
+<pre class="code sh literal-block">
+% print -l **/*&lt;CTRL X&gt;&lt;g&gt;
+</pre>
+<p>… and you will be presented with this result:</p>
+<pre class="code sh literal-block">
+% print -l **/*
+/           ▶ directories
+F           ▶ non-empty directories <span class="o">(</span>full<span class="o">)</span>
+.           ▶ plain files
+-           ▶ executable plain files
+l<span class="o">[</span>-+<span class="o">]</span>n      ▶ link count
+r,w,x       ▶ owner <span class="o">(</span>r<span class="o">)</span>eadable <span class="o">(</span>w<span class="o">)</span>ritable,
+              e<span class="o">(</span>x<span class="o">)</span>ecutable files
+A,I,E       ▶ group re<span class="o">(</span>A<span class="o">)</span>dable wr<span class="o">(</span>I<span class="o">)</span>table,
+              <span class="o">(</span>E<span class="o">)</span>xecutable files
+R,W,X       ▶ world <span class="o">(</span>R<span class="o">)</span>readable, <span class="o">(</span>W<span class="o">)</span>ritable,
+              e<span class="o">(</span>X<span class="o">)</span>ecutable files
+s,G,t       ▶ setuid, setgid, sticky bit files
+f<span class="o">[</span>+<span class="o">=</span>-<span class="o">]</span>NNN   ▶ files with access rights matching
+              +,-,<span class="o">=</span> octal number
+<span class="o">{</span>U,G<span class="o">}</span>NNN    ▶ owned by effective <span class="o">(</span>U<span class="o">)</span>ser,<span class="o">(</span>G<span class="o">)</span>roup
+              ID
+<span class="o">{</span>u,g<span class="o">}</span>NNN    ▶ owned by user, group id <span class="sb">`</span>NNN<span class="sb">`</span>
+<span class="o">{</span>u,g<span class="o">}</span>:name: ▶ owned by user, group name <span class="sb">`</span>name<span class="sb">`</span>
+   ...18 hints omitted.
+</pre>
+<p>A quick glance will help you conclude that <tt class="docutils literal">(.sW)</tt> is what you are looking for.</p>
+<p>This example was made on a rather small terminal.  That is why some of the explanations were wrapped, and were displayed with a secondary separator of just a space. It also did not fit in the vertical direction.  An optional message notifying how much you are missing on is displayed.</p>
+<p>The key file is really simple to make: It just assumes that the first space separates the key from the explanation. There is no way of putting a space in the key.</p>
+<p>All the details of installation and configuration are covered in the <a class="reference external" href="https://github.com/joepvd/zsh-hints">README</a>. Please let me know if it does or does not work for you.</p>
+<p>Enjoy :)</p>
+
+        </article>
+        
+        <article>
           <a class="title" href="http://joepvd.github.io/revisiting-array-to-quote.html">
             <h2>Revisiting array-to-quote</h2>
             <p class=sub-header>
@@ -116,7 +160,7 @@ bindkey <span class="err">'</span>^<span class="se">\'</span> array-to-pipe
     <span class="k">and</span> <span class="n">reltuples</span> <span class="o">&gt;</span> <span class="mi">0</span>
 <span class="k">order</span> <span class="k">by</span> <span class="n">reltuples</span><span class="p">;</span>
 </pre>
-<p>It is a bit of a nuisance to need to edit this text often to enter the column that I am looking for. With the following line, I can type the column on the command line, and after pressing <tt class="docutils literal"><span class="pre">Alt-c</span></tt> (for columns), the following happens:</p>
+<p>It is a bit of a nuisance to need to edit this text often to enter the column that I am looking for. With the following line, I can type the column on the command line, and after pressing <tt class="docutils literal"><span class="pre">Alt-c</span></tt> (mnemonic: columns), the following happens:</p>
 <pre class="code console literal-block">
 <span class="go">=&gt; colname&lt;Alt-c&gt;
 =&gt; select distinct
@@ -140,7 +184,7 @@ bindkey <span class="err">'</span>^<span class="se">\'</span> array-to-pipe
 └─────────────┴──────────┘
 (7 rows)</span>
 </pre>
-<p>The following, admittedly very ugly, line in <tt class="docutils literal"><span class="pre">~.,inputc</span></tt> makes this possible:</p>
+<p>The following, admittedly very ugly, line in <tt class="docutils literal"><span class="pre">~/.,inputc</span></tt> makes this possible:</p>
 <div class="highlight"><pre><span class="s2">&quot;^[c&quot;</span>: <span class="s2">&quot;\C-a\C-kselect distinct\n  relname as table,\n  reltuples as rowcount \nfrom information_schema.columns as cols \njoin pg_class on pg_class.relname = cols.table_name \nwhere column_name = &#39;\C-y&#39;\n  and reltuples &gt; 0 \norder by reltuples;\n&quot;</span>
 </pre></div>
 <dl class="docutils">

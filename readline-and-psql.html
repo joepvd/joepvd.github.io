@@ -62,7 +62,7 @@
     <span class="k">and</span> <span class="n">reltuples</span> <span class="o">&gt;</span> <span class="mi">0</span>
 <span class="k">order</span> <span class="k">by</span> <span class="n">reltuples</span><span class="p">;</span>
 </pre>
-<p>It is a bit of a nuisance to need to edit this text often to enter the column that I am looking for. With the following line, I can type the column on the command line, and after pressing <tt class="docutils literal"><span class="pre">Alt-c</span></tt> (for columns), the following happens:</p>
+<p>It is a bit of a nuisance to need to edit this text often to enter the column that I am looking for. With the following line, I can type the column on the command line, and after pressing <tt class="docutils literal"><span class="pre">Alt-c</span></tt> (mnemonic: columns), the following happens:</p>
 <pre class="code console literal-block">
 <span class="go">=&gt; colname&lt;Alt-c&gt;
 =&gt; select distinct
@@ -86,7 +86,7 @@
 └─────────────┴──────────┘
 (7 rows)</span>
 </pre>
-<p>The following, admittedly very ugly, line in <tt class="docutils literal"><span class="pre">~.,inputc</span></tt> makes this possible:</p>
+<p>The following, admittedly very ugly, line in <tt class="docutils literal"><span class="pre">~/.,inputc</span></tt> makes this possible:</p>
 <div class="highlight"><pre><span class="s2">&quot;^[c&quot;</span>: <span class="s2">&quot;\C-a\C-kselect distinct\n  relname as table,\n  reltuples as rowcount \nfrom information_schema.columns as cols \njoin pg_class on pg_class.relname = cols.table_name \nwhere column_name = &#39;\C-y&#39;\n  and reltuples &gt; 0 \norder by reltuples;\n&quot;</span>
 </pre></div>
 <dl class="docutils">

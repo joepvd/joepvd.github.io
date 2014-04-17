@@ -1,5 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>escape code</title><link href="http://joepvd.github.io/" rel="alternate"></link><link href="http://joepvd.github.io/all.atom" rel="self"></link><id>http://joepvd.github.io/</id><updated>2014-04-15T00:00:00+02:00</updated><entry><title>Revisiting array-to-quote</title><link href="http://joepvd.github.io/revisiting-array-to-quote.html" rel="alternate"></link><updated>2014-04-15T00:00:00+02:00</updated><author><name>joepd</name></author><id>tag:joepvd.github.io,2014-04-15:revisiting-array-to-quote.html</id><summary type="html">&lt;p&gt;Computing professionals are in some way similar to athletes and musicians: Continued practicing sessions makes them better at what they do.  Interestingly, it seems that there is not so much a culture of inconsequential coding sessions to sharpen your skills.  Dave Thomas practices what he preaches with &lt;a class="reference external" href="http://codekata.com"&gt;Code kata&lt;/a&gt;'s.&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>escape code</title><link href="http://joepvd.github.io/" rel="alternate"></link><link href="http://joepvd.github.io/all.atom" rel="self"></link><id>http://joepvd.github.io/</id><updated>2014-04-17T00:00:00+02:00</updated><entry><title>zsh: learn while doing</title><link href="http://joepvd.github.io/zsh-learn-while-doing.html" rel="alternate"></link><updated>2014-04-17T00:00:00+02:00</updated><author><name>joepd</name></author><id>tag:joepvd.github.io,2014-04-17:zsh-learn-while-doing.html</id><summary type="html">&lt;p&gt;What good are advanced and hard to remember features if there is no help available at a fingertip?  Globbing in zsh might be the best thing since sliced bread, but if you don't know the details, you might as well be chewing on a brick.&lt;/p&gt;
+&lt;p&gt;So, why not organize in such a way so that the details are readily available?  One of the many nice ideas from feh's &lt;a class="reference external" href="http://git.plenz.com/configs/plain/.zsh/zshrc"&gt;excellent zsh configuration file&lt;/a&gt; does exactly that, but it looked ugly on a too small terminal, and it looks like quite some manual work to format the information in &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;~/.zshrc&lt;/span&gt;&lt;/tt&gt;.  So I made &lt;a class="reference external" href="https://github.com/joepvd/zsh-hints"&gt;zsh-hints&lt;/a&gt;, a small helper program that turns a definition file into helpful hints.&lt;/p&gt;
+&lt;p&gt;Who can remember all those &lt;a class="reference external" href="http://zsh.sourceforge.net/Doc/Release/Expansion.html#Glob-Operators"&gt;glob flags&lt;/a&gt;?  Imagine wanting to see the Setgid, and world readable files in somewhere here in a subdirectory. Just hit &lt;tt class="docutils literal"&gt;&amp;lt;CTRL &lt;span class="pre"&gt;X&amp;gt;&amp;lt;g&amp;gt;&lt;/span&gt;&lt;/tt&gt; …&lt;/p&gt;
+&lt;pre class="code sh literal-block"&gt;
+% print -l **/*&amp;lt;CTRL X&amp;gt;&amp;lt;g&amp;gt;
+&lt;/pre&gt;
+&lt;p&gt;… and you will be presented with this result:&lt;/p&gt;
+&lt;pre class="code sh literal-block"&gt;
+% print -l **/*
+/           ▶ directories
+F           ▶ non-empty directories &lt;span class="o"&gt;(&lt;/span&gt;full&lt;span class="o"&gt;)&lt;/span&gt;
+.           ▶ plain files
+-           ▶ executable plain files
+l&lt;span class="o"&gt;[&lt;/span&gt;-+&lt;span class="o"&gt;]&lt;/span&gt;n      ▶ link count
+r,w,x       ▶ owner &lt;span class="o"&gt;(&lt;/span&gt;r&lt;span class="o"&gt;)&lt;/span&gt;eadable &lt;span class="o"&gt;(&lt;/span&gt;w&lt;span class="o"&gt;)&lt;/span&gt;ritable,
+              e&lt;span class="o"&gt;(&lt;/span&gt;x&lt;span class="o"&gt;)&lt;/span&gt;ecutable files
+A,I,E       ▶ group re&lt;span class="o"&gt;(&lt;/span&gt;A&lt;span class="o"&gt;)&lt;/span&gt;dable wr&lt;span class="o"&gt;(&lt;/span&gt;I&lt;span class="o"&gt;)&lt;/span&gt;table,
+              &lt;span class="o"&gt;(&lt;/span&gt;E&lt;span class="o"&gt;)&lt;/span&gt;xecutable files
+R,W,X       ▶ world &lt;span class="o"&gt;(&lt;/span&gt;R&lt;span class="o"&gt;)&lt;/span&gt;readable, &lt;span class="o"&gt;(&lt;/span&gt;W&lt;span class="o"&gt;)&lt;/span&gt;ritable,
+              e&lt;span class="o"&gt;(&lt;/span&gt;X&lt;span class="o"&gt;)&lt;/span&gt;ecutable files
+s,G,t       ▶ setuid, setgid, sticky bit files
+f&lt;span class="o"&gt;[&lt;/span&gt;+&lt;span class="o"&gt;=&lt;/span&gt;-&lt;span class="o"&gt;]&lt;/span&gt;NNN   ▶ files with access rights matching
+              +,-,&lt;span class="o"&gt;=&lt;/span&gt; octal number
+&lt;span class="o"&gt;{&lt;/span&gt;U,G&lt;span class="o"&gt;}&lt;/span&gt;NNN    ▶ owned by effective &lt;span class="o"&gt;(&lt;/span&gt;U&lt;span class="o"&gt;)&lt;/span&gt;ser,&lt;span class="o"&gt;(&lt;/span&gt;G&lt;span class="o"&gt;)&lt;/span&gt;roup
+              ID
+&lt;span class="o"&gt;{&lt;/span&gt;u,g&lt;span class="o"&gt;}&lt;/span&gt;NNN    ▶ owned by user, group id &lt;span class="sb"&gt;`&lt;/span&gt;NNN&lt;span class="sb"&gt;`&lt;/span&gt;
+&lt;span class="o"&gt;{&lt;/span&gt;u,g&lt;span class="o"&gt;}&lt;/span&gt;:name: ▶ owned by user, group name &lt;span class="sb"&gt;`&lt;/span&gt;name&lt;span class="sb"&gt;`&lt;/span&gt;
+   ...18 hints omitted.
+&lt;/pre&gt;
+&lt;p&gt;A quick glance will help you conclude that &lt;tt class="docutils literal"&gt;(.sW)&lt;/tt&gt; is what you are looking for.&lt;/p&gt;
+&lt;p&gt;This example was made on a rather small terminal.  That is why some of the explanations were wrapped, and were displayed with a secondary separator of just a space. It also did not fit in the vertical direction.  An optional message notifying how much you are missing on is displayed.&lt;/p&gt;
+&lt;p&gt;The key file is really simple to make: It just assumes that the first space separates the key from the explanation. There is no way of putting a space in the key.&lt;/p&gt;
+&lt;p&gt;All the details of installation and configuration are covered in the &lt;a class="reference external" href="https://github.com/joepvd/zsh-hints"&gt;README&lt;/a&gt;. Please let me know if it does or does not work for you.&lt;/p&gt;
+&lt;p&gt;Enjoy :)&lt;/p&gt;
+</summary></entry><entry><title>Revisiting array-to-quote</title><link href="http://joepvd.github.io/revisiting-array-to-quote.html" rel="alternate"></link><updated>2014-04-15T00:00:00+02:00</updated><author><name>joepd</name></author><id>tag:joepvd.github.io,2014-04-15:revisiting-array-to-quote.html</id><summary type="html">&lt;p&gt;Computing professionals are in some way similar to athletes and musicians: Continued practicing sessions makes them better at what they do.  Interestingly, it seems that there is not so much a culture of inconsequential coding sessions to sharpen your skills.  Dave Thomas practices what he preaches with &lt;a class="reference external" href="http://codekata.com"&gt;Code kata&lt;/a&gt;'s.&lt;/p&gt;
 &lt;p&gt;The nice part about repetitive tasks, is that there is a reason to automate 'em.  And when the automated solution starts to feel like a drag, it's time to improve the solution.  Repetitive tasks lend themselves very well to katas.  You probably know the corner cases, and have some ideas of what would suit your work flow.  Continued study of the mechanics of simple manipulations really can get you forward.  As an addition to the metaphor of kata's, I'd like to propose to think about the wood worker sharpening his tools.&lt;/p&gt;
 &lt;p&gt;That was more than enough meta for an introduction to pretty down-to-earth stuff.  As I regularly have to shape one output in a quoted, comma separated list, I came to revisit the solution posted in my &lt;a class="reference external" href="http://joepvd.github.io/parameter-expansion-in-zsh.html"&gt;first post&lt;/a&gt;.  This time, I set myself to make a keyboard shortcut that operates on the closest word to the cursor in a terminal running zsh.&lt;/p&gt;
 &lt;p&gt;Just drop this part in your &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;~/.zshrc&lt;/span&gt;&lt;/tt&gt;, and you should have that short moment of gratification when it seems that the computer is obeying your will at the gentlest of gestures:&lt;/p&gt;
@@ -65,7 +99,7 @@ bindkey &lt;span class="err"&gt;'&lt;/span&gt;^&lt;span class="se"&gt;\'&lt;/spa
     &lt;span class="k"&gt;and&lt;/span&gt; &lt;span class="n"&gt;reltuples&lt;/span&gt; &lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;
 &lt;span class="k"&gt;order&lt;/span&gt; &lt;span class="k"&gt;by&lt;/span&gt; &lt;span class="n"&gt;reltuples&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
 &lt;/pre&gt;
-&lt;p&gt;It is a bit of a nuisance to need to edit this text often to enter the column that I am looking for. With the following line, I can type the column on the command line, and after pressing &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;Alt-c&lt;/span&gt;&lt;/tt&gt; (for columns), the following happens:&lt;/p&gt;
+&lt;p&gt;It is a bit of a nuisance to need to edit this text often to enter the column that I am looking for. With the following line, I can type the column on the command line, and after pressing &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;Alt-c&lt;/span&gt;&lt;/tt&gt; (mnemonic: columns), the following happens:&lt;/p&gt;
 &lt;pre class="code console literal-block"&gt;
 &lt;span class="go"&gt;=&amp;gt; colname&amp;lt;Alt-c&amp;gt;
 =&amp;gt; select distinct
@@ -89,7 +123,7 @@ bindkey &lt;span class="err"&gt;'&lt;/span&gt;^&lt;span class="se"&gt;\'&lt;/spa
 └─────────────┴──────────┘
 (7 rows)&lt;/span&gt;
 &lt;/pre&gt;
-&lt;p&gt;The following, admittedly very ugly, line in &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;~.,inputc&lt;/span&gt;&lt;/tt&gt; makes this possible:&lt;/p&gt;
+&lt;p&gt;The following, admittedly very ugly, line in &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;~/.,inputc&lt;/span&gt;&lt;/tt&gt; makes this possible:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="s2"&gt;&amp;quot;^[c&amp;quot;&lt;/span&gt;: &lt;span class="s2"&gt;&amp;quot;\C-a\C-kselect distinct\n  relname as table,\n  reltuples as rowcount \nfrom information_schema.columns as cols \njoin pg_class on pg_class.relname = cols.table_name \nwhere column_name = &amp;#39;\C-y&amp;#39;\n  and reltuples &amp;gt; 0 \norder by reltuples;\n&amp;quot;&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;dl class="docutils"&gt;
