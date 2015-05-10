@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>grep2awk: A small zsh/zle helper</title>
+    <link rel="stylesheet" href="http://joepvd.github.io/theme/css/main.css">
+      <link href="http://joepvd.github.io/all.atom" type="application/atom+xml" rel="alternate" title="escape code Atom Feed" />
+  </head>
+
+  <body>
+    <header> 
+      <a href="http://joepvd.github.io/index.html" id=header>
+        <h1>
+          escape code         </h1>
+      </a>
+      <nav>
+          <a class=nav href="http://joepvd.github.io/archives.html">Archives</a>
+            <a class=nav href="http://joepvd.github.io/pages/about-this-website.html">About this website</a>
+          <a href="http://joepvd.github.io/all.atom"
+            type="application/atom+xml" rel="alternate" title="escape code
+            Atom Feed">
+            <img 
+              src="http://joepvd.github.io/theme/images/icons/rss.png"
+              alt="Atom feed" 
+              width="20px"
+              height="20px"
+            />
+          </a>
+      </nav>
+    </header>
+
+<section id="content" class="body">
+  <article>
+    <a          class="title"
+                href="http://joepvd.github.io/grep2awk-a-small-zshzle-helper.html" 
+                rel="bookmark" 
+                title="Permalink to grep2awk: A small zsh/zle helper">
+      <h2>grep2awk: A small zsh/zle helper</h2>
+      <p class=sub-header>
+        joepd, 10 May 2015
+      </p>
+    </a> <!-- /.article-title -->
+    <div class="content">
+      <p>While trying to find the needle in a haystack, you find yourself recklessly grepping some log files.  Suddenly, it occurs to you that there might be a pattern in the data, and <tt class="docutils literal">awk</tt> will be the fastest way to figure out if this pattern has any relevance or not.  You want to change your <tt class="docutils literal">grep</tt> into an <tt class="docutils literal">awk</tt> oneliner.</p>
+<p>This involves some mechanical work: Arrow up to get to the command line, move to the word <tt class="docutils literal">grep</tt> and change it, forward to the start of the regular expression and add <tt class="docutils literal">'/</tt>. Move to the end of the regular expression, and type: <tt class="docutils literal">/ {}'</tt>.  Not a big deal, but mechanical work, which does add up if you're doing this eight times a day.</p>
+<p>For this slight inconvenience, the tool <tt class="docutils literal">grep2awk</tt> was written. It finds the first occurrence of the word <tt class="docutils literal">grep</tt> in the current command line, and tries to convert the options and the regular expression into a skeleton for an <tt class="docutils literal">awk</tt>-script.  Just press a key you have chosen yourself, and you're already past the point of potential distraction which the mechanical work can entail.</p>
+<div class="section" id="how-to-use">
+<h2>How to use:</h2>
+<p>Clone the repository someplace:</p>
+<pre class="code sh literal-block">
+git clone <span class="s1">'https://github.com/joepvd/grep2awk.git'</span>
+</pre>
+<p>Then put the file <tt class="docutils literal">grep2awk</tt> somewhere in your <tt class="docutils literal">$fpath</tt>.  Make sure the file gets <tt class="docutils literal">autoload</tt>-ed, making the script known as a line editor (<tt class="docutils literal">zle</tt>) script, and assigning a key binding to it:</p>
+<pre class="code sh literal-block">
+autoload -Uz grep2awk
+zle -N grep2awk
+bindkey <span class="s2">&quot;^X^A&quot;</span> grep2awk
+</pre>
+<p>Now, pressing <tt class="docutils literal"><span class="pre">&lt;CTRL-X&gt;</span></tt>-<tt class="docutils literal"><span class="pre">&lt;CTRL-A&gt;</span></tt> will bring you goodies!</p>
+</div>
+<div class="section" id="the-following-grep-options-are-supported">
+<h2>The following grep options are supported:</h2>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">-v</span></tt></dt>
+<dd>inverse match</dd>
+<dt><tt class="docutils literal"><span class="pre">-w</span></tt></dt>
+<dd>word match</dd>
+<dt><tt class="docutils literal"><span class="pre">-x</span></tt></dt>
+<dd>line match</dd>
+<dt><tt class="docutils literal"><span class="pre">-l</span></tt></dt>
+<dd>list matching files</dd>
+<dt><tt class="docutils literal"><span class="pre">-L</span></tt></dt>
+<dd>list not matching files</dd>
+<dt><tt class="docutils literal"><span class="pre">-H</span></tt></dt>
+<dd>include filename in result</dd>
+<dt><tt class="docutils literal"><span class="pre">-n</span></tt></dt>
+<dd>include line number in result</dd>
+<dt><tt class="docutils literal"><span class="pre">-c</span></tt></dt>
+<dd>count occurrences per file</dd>
+<dt><tt class="docutils literal"><span class="pre">-i</span></tt></dt>
+<dd>case insensitive matching</dd>
+<dt><tt class="docutils literal"><span class="pre">-E</span></tt></dt>
+<dd>Extended Regular Expressions</dd>
+<dt><tt class="docutils literal"><span class="pre">-F</span></tt></dt>
+<dd>Fixed string matching</dd>
+</dl>
+</div>
+<div class="section" id="development">
+<h2>Development</h2>
+<p>If you <tt class="docutils literal">source</tt> the file <tt class="docutils literal">init.zsh</tt>, the development version of <tt class="docutils literal">grep2awk</tt> will be made available under key binding <tt class="docutils literal"><span class="pre">&lt;CTRL-P&gt;</span></tt>. Handy for quick testing.</p>
+<p>There is a testing library in the <tt class="docutils literal">t</tt>-directory, in which the testing framework from the <cite>ZSH</cite>-project has been adjusted to work with the currently installed shell.  Please run and update the tests when playing with the code.</p>
+</div>
+<div class="section" id="bugs">
+<h2>Bugs</h2>
+<p>There are some bugs.  The conversion from Basic Regular Expressions (which bare <tt class="docutils literal">grep</tt> uses) to Extended Regular Expressions (which <tt class="docutils literal">egrep</tt> and <tt class="docutils literal">awk</tt> use) has not been implemented. The treatment of backslashes in the conversion from Fixed String to Extended Regular Expression is not working.  Furthermore, the context options (<tt class="docutils literal"><span class="pre">-A</span></tt>, <tt class="docutils literal"><span class="pre">-B</span></tt>, <tt class="docutils literal"><span class="pre">-C</span></tt>) are not implemented, as well as <tt class="docutils literal"><span class="pre">-o</span></tt> (only-matching). Some fuky stuff with snooping aliases and the (deprecated) environment variable <tt class="docutils literal">GREP_OPTIONS</tt> is as of yet not implemented. Also, colorized output is not supported.</p>
+<p>Please let me know whether you like it, and what could be better to support your needs!</p>
+</div>
+
+    </div>
+  </article>
+</section>
+
+    <footer>
+      <address id="about" class="vcard body">
+        Powered by <a href="http://getpelican.com/">Pelican</a>. 
+      </address><!-- /#about -->
+
+      <p>
+      All rights reserved. All wrongs reversed. All is released in the public
+      domain. 
+      </p>
+    </footer>
+  </body>
+</html>
